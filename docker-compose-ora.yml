@@ -1,0 +1,25 @@
+# This is docker-compose override file for the base docker-compose.yml that adds oracle gtrep container to the same environment.
+# Use:
+#      docker-compose -f docker-compose.yml -f docker-compose-ora.yml up -d
+
+version: '3.5'
+
+services:
+  database:
+    image: tdm/officialoracle-gtrep:11.2.0.2-xe
+    shm_size: '1G'
+    hostname: database
+    # Uncomment the following lines to expose the Oracle DB port
+    ports:
+      - '1521:1521'
+  tdmweb:
+    hostname: tdmweb
+    environment:
+      - 'GTREP_HOST=database'
+      - 'GTREP_PORT=1521'
+      - 'GTREP_USER=gtrep'
+      - 'GTREP_PASSWORD=Gridt00ls'
+      - 'GTREP_SERVICE_NAME=xe'
+    depends_on:
+      - orientdb
+      - database

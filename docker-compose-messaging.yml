@@ -1,0 +1,34 @@
+version: '3.5'
+
+networks:
+  default:
+    name: tdm_default
+services:
+  messaging:
+    image: tdm/messaging:4.9.38.0
+    hostname: messaging
+    ports:
+      # Expose rabbitmq port in order to make it possible to scale with remote masking engines
+      - '5671:5671'
+      # Expose port 15671 to allow HTTPS access to the rabbitmq management console.
+      #- '15671:15671'
+    environment:
+      - RABBITMQ_LOG_BASE=/var/log/rabbitmq/log
+      - RABBITMQ_LOGS=/var/log/rabbitmq/log/rabbitmq.log
+      - RABBITMQ_SASL_LOGS=/var/log/rabbitmq/log/rabbitmq_sasl.log
+      # Specify your messaging credentials here
+      # These values should match the credentials which have been specified
+      # in the tdmweb and masking containers above. These credentials will
+      # be used to create a user on the message broker.
+      - 'DEFAULT_USER=Admin'
+      - 'DEFAULT_PASS={cry}1hY5pZrm87PWjgPdmypDbVZnL4a108lxy8YLuUVRMCr8'
+      # SSL selfsigned certificate only
+      - RABBITMQ_SSL_CACERTFILE=/home/testca/cacert.pem
+      - RABBITMQ_SSL_CERTFILE=/home/server/cert.pem
+      - RABBITMQ_SSL_FAIL_IF_NO_PEER_CERT=false
+      - RABBITMQ_SSL_KEYFILE=/home/server/key.pem
+      - RABBITMQ_SSL_VERIFY=verify_none
+    volumes:
+      - 'messaging_rabbitmqdb:/var/lib/rabbitmq'
+volumes:
+  messaging_rabbitmqdb:
